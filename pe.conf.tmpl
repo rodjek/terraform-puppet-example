@@ -1,0 +1,19 @@
+"console_admin_password": "puppetlabs"
+
+# Hostname
+"puppet_enterprise::puppet_master_host": "%%{::trusted.certname}"
+"pe_install::puppet_master_dnsaltnames": [${ join(", ", formatlist("\"%s\"", dns_alt_names)) }]
+
+
+# Code Manager
+"puppet_enterprise::profile::master::code_manager_auto_configure": true
+"puppet_enterprise::profile::master::r10k_private_key": "/etc/puppetlabs/r10k-key"
+
+# Disable update checks
+"puppet_enterprise::profile::master::check_for_updates": false
+
+# Configure for low memory use on local machines
+"puppet_enterprise::profile::master::java_args": {"Xmx": "256m", "Xms": "256m"}
+"puppet_enterprise::profile::puppetdb::java_args": {"Xmx": "256m", "Xms": "256m"}
+"puppet_enterprise::profile::console::java_args": {"Xmx": "256m", "Xms": "256m"}
+"puppet_enterprise::profile::orchestrator::java_args": {"Xmx": "256m", "Xms": "256m"}

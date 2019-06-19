@@ -1,0 +1,13 @@
+{
+    "PE Master": {
+        "classes": {
+            "autosign": {
+                "config": {
+                    "jwt_token": {
+                        "secret": "hunter2"
+                    }
+                }
+            }
+        }
+    }
+}
