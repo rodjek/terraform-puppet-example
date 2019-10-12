@@ -63,17 +63,17 @@ resource "aws_instance" "agent" {
   instance_type = "t2.medium"
   key_name      = var.aws_key_pair
 
-  connection {
-    host        = coalesce(self.public_ip, self.private_ip)
-    type        = "ssh"
-    user        = "ubuntu"
-    private_key = file("~/.ssh/id_rsa")
-  }
-
   provisioner "puppet" {
     use_sudo    = true
     server      = aws_instance.puppetmaster.public_dns
     server_user = "ubuntu"
+
+    connection {
+      host        = coalesce(self.public_ip, self.private_ip)
+      type        = "ssh"
+      user        = "ubuntu"
+      private_key = file("~/.ssh/id_rsa")
+    }
   }
 }
 
@@ -81,13 +81,6 @@ resource "aws_instance" "os_agent" {
   ami           = var.aws_ami_id
   instance_type = "t2.medium"
   key_name      = var.aws_key_pair
-
-  connection {
-    host        = coalesce(self.public_ip, self.private_ip)
-    type        = "ssh"
-    user        = "ubuntu"
-    private_key = file("~/.ssh/id_rsa")
-  }
 
   provisioner "puppet" {
     use_sudo    = true
@@ -98,6 +91,13 @@ resource "aws_instance" "os_agent" {
       pp_role = "test"
       pp_provisioner = "terraform"
       pp_application = "awesome_thing"
+    }
+
+    connection {
+      host        = coalesce(self.public_ip, self.private_ip)
+      type        = "ssh"
+      user        = "ubuntu"
+      private_key = file("~/.ssh/id_rsa")
     }
   }
 }
@@ -113,7 +113,6 @@ data "template_file" "winrm" {
     Start-Service winrm
 </powershell>
 EOD
-
 }
 
 resource "aws_instance" "os_win_agent" {
@@ -126,18 +125,18 @@ resource "aws_instance" "os_win_agent" {
     create = "15m"
   }
 
-  connection {
-    host = coalesce(self.public_ip, self.private_ip)
-    type = "winrm"
-    user = "Administrator"
-    password = rsadecrypt(self.password_data, file("~/.ssh/id_rsa"))
-    timeout = "10m"
-  }
-
   provisioner "puppet" {
     open_source = true
     server = aws_instance.puppetmaster.public_dns
     server_user = "ubuntu"
+
+    connection {
+      host = coalesce(self.public_ip, self.private_ip)
+      type = "winrm"
+      user = "Administrator"
+      password = rsadecrypt(self.password_data, file("~/.ssh/id_rsa"))
+      timeout = "10m"
+    }
   }
 
   user_data = data.template_file.winrm.rendered
@@ -153,19 +152,18 @@ resource "aws_instance" "win_agent" {
     create = "15m"
   }
 
-  connection {
-    host = coalesce(self.public_ip, self.private_ip)
-    type = "winrm"
-    user = "Administrator"
-    password = rsadecrypt(self.password_data, file("~/.ssh/id_rsa"))
-    timeout = "10m"
-  }
-
   provisioner "puppet" {
     server = aws_instance.puppetmaster.public_dns
     server_user = "ubuntu"
+
+    connection {
+      host = coalesce(self.public_ip, self.private_ip)
+      type = "winrm"
+      user = "Administrator"
+      password = rsadecrypt(self.password_data, file("~/.ssh/id_rsa"))
+      timeout = "10m"
+    }
   }
 
   user_data = data.template_file.winrm.rendered
 }
-
